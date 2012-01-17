@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
 <!--
- * build.xml
+ * application.xml
  * Created on 10 September 2008, 10:03
  * Modified on 21 September 2011, 14:27
  * @author Peter.Withers@mpi.nl
 -->
-<project name="DesktopInstaller" default="scp_to_lux09">
+<project name="installer" default="maven-jar">
     <target name="setproperties">
-        <property name="application.current.major" value="0"/>
-        <property name="application.current.minor" value="8"/>
-        <property name="application.versionidentifier" value="-testing"/>
-        <property name="application.displaytitle" value="KinOath (testing)"/>
-        <property name="application.icon-file-name" value="kinoath${application.versionidentifier}128x128"/>
-        <property name="SRCDIR" value="../desktop/src/main/java/"/>
-        <property name="IconsDir" value="../desktop/src/main/resources/nl/mpi/kinnate/resources/icons/"/>
-        <property name="OUTPUTDIR" value="${user.home}/Desktop/kinoath-build-${application.current.major}.${application.current.minor}.x/"/>
-        <property name="ClassesDir" value="../desktop/target/classes"/>
+        <loadproperties srcfile="../application.properties" />
+        <property name="APPNAME" value="${application.name}" />
+        <property name="SRCDIR" value="${application.baseDir}src/main/java/"/>
+        <property name="IconsDir" value="${application.baseDir}${application.iconsDir}"/>
+        <property name="OUTPUTDIR" value="${user.home}/Desktop/${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x/"/>
         <property name="LIBDIR" value="${OUTPUTDIR}lib/"/>
-        <property name="pathToMpiTrunk" value="../../../trunk/"/> <!-- pathToMpiTrunk is being used until a better method becomes available (such as when the required files are in a maven like repository) -->
-        <property name="LongDescription" value="KinOath is a kinship application with the primary goal of connecting kinship data with archived data, such as audio, video or written resources while also being closely integrated with the archive software such as Arbil. Beyond this primary goal it is designed to be flexible and culturally nonspecific, such that culturally different social structures can equally be represented. Kin type strings are used throughout the application for constructing and searching data sets. The representation of kin terms is also integrated into the application allowing comparative diagrams of kin terms. Graphical representation of the data is an important part of the application and the diagrams produced are intended to very flexible and of publishable quality.
-http://www.lat-mpi.eu/tools/imdi/kinoath/"/>
-        <property name="ShortDescription" value="KinOath is a kinship application that is flexible, culturally nonspecific and produces diagrams of publishable quality."/>
+        <property name="KeyStoreLocation" value="${application.baseDir}${mpi.keystorelocation}" />
+        <property name="TypeCheckVersion" value="1.6.5" />
+        <property name="application.icon-file-name" value="${APPNAME}${application.branch}128x128"/>
+    </target>
+    <target name="loadproperties" depends="maven-compile">
+        <loadproperties srcfile="../target/classes/version.properties" />
+        <property name="JarPrefix" value="${APPNAME}${application.branch}-${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
+        <property name="DistJarName" value="${JarPrefix}.jar"/>
     </target>
     <target name="clean" description="remove all artifact files" depends="setproperties">
         <delete dir="${OUTPUTDIR}"/>
@@ -28,23 +28,23 @@ http://www.lat-mpi.eu/tools/imdi/kinoath/"/>
     </target>
 <!-- start package creation -->
     <path id="ant-deb.classpath">
-        <fileset dir="../desktop/ant-deb-jar/" includes="*.jar"/>
+        <fileset dir="./ant-deb-jar/" includes="*.jar"/>
     </path>
     <!-- http://code.google.com/p/ant-deb-task/ -->
     <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant-deb.classpath"/>
     <taskdef name="desktopEntry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant-deb.classpath"/>
-    <target name="makeDebPackage" depends="signkinoath" description="build the deb file">
-        <property name="package.name" value="kinoath${application.versionidentifier}"/>
+    <target name="makeDebPackage" depends="maven-jar" description="build the deb file">
+        <property name="package.name" value="${APPNAME}${application.branch}"/>
         <property name="package.jarname" value="${DistJarName}"/>
         <!--check that the icon exists and fail if not-->
         <available file="${IconsDir}${application.icon-file-name}.png" property="packageIconAvail"/>
-        <fail unless="packageIconAvail" message="${application.icon-file-name}.png doesn't exist!"/>
+        <fail unless="packageIconAvail" message="${IconsDir}${application.icon-file-name}.png doesn't exist!"/>
         <property name="distributionDirectory" value="${OUTPUTDIR}/distribution"/>
         <mkdir dir="${distributionDirectory}"/>
         <desktopEntry
             toFile="${distributionDirectory}/${package.name}.desktop"
-            name="${application.displaytitle}"
-            comment="${ShortDescription}"
+            name="${application.title}"
+            comment="${application.shortDescription}"
             exec="java -jar /usr/share/${package.name}/${package.jarname}"
             path="/usr/share/${package.name}/"
             icon="/usr/share/${package.name}/${application.icon-file-name}.png"
@@ -56,9 +56,9 @@ http://www.lat-mpi.eu/tools/imdi/kinoath/"/>
             section="science"
             depends="sun-java5-jre | sun-java6-jre, ffmpeg, imagemagick"            
         > <!-- homepage="http://www.lat-mpi.eu/tools/kinoath" deb doesn't support the "homepage" attribute -->
-            <version upstream="${application.current.major}.${application.current.minor}" debian="${application.current.revision}"/>
+            <version upstream="${application.majorVersion}.${application.minorVersion}" debian="${application.revision}"/>
             <maintainer name="Peter Withers" email="Peter.Withers@mpi.nl"/>
-            <description synopsis="${ShortDescription}">${LongDescription}</description>
+            <description synopsis="${application.shortDescription}">${application.longDescription}</description>
             <tarfileset file="${OUTPUTDIR}/${package.jarname}" prefix="usr/share/${package.name}"/>
             <tarfileset file="${IconsDir}${application.icon-file-name}.png" prefix="usr/share/${package.name}"/>
             <tarfileset dir="${LIBDIR}" prefix="usr/share/${package.name}/lib">
@@ -68,26 +68,26 @@ http://www.lat-mpi.eu/tools/imdi/kinoath/"/>
         </deb>
     </target>
 <!-- end package creation -->
-    <target name="updateJnlpAndAppletHtml" depends="clean, getsvnversion">
-<!--todo: the jar name should have the application.versionidentifier included-->
+    <target name="updateJnlpAndAppletHtml" depends="loadproperties">
+<!--todo: the jar name should have the application.branch included-->
         <macrodef name="updateSingleFile">
             <attribute name="fileName"/>
             <sequential>
                 <copy overwrite="true" file="./templates/@{fileName}.template" tofile="${OUTPUTDIR}/distribution/@{fileName}">
                     <filterchain>
                         <replacetokens>
-                            <token key="VersionNumber" value="${application.current.major}-${application.current.minor}-${application.current.revision}"/>
+                            <token key="VersionNumber" value="${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
                             <token key="DistJarName" value="${DistJarName}"/>
-                            <token key="BuildDirectory" value="kinoath-build-${application.current.major}.${application.current.minor}.x"/>
+                            <token key="BuildDirectory" value="${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x"/>
                             <token key="InstalledIcon" value="${application.icon-file-name}"/>
                             <token key="TypeCheckVersion" value="${TypeCheckVersion}"/>
-                            <token key="FilenameIdentifier" value="${application.versionidentifier}"/>
-                            <token key="ApplicationTitle" value="${application.displaytitle}"/>
-                            <token key="LongDescription" value="${LongDescription}"/>
-                            <token key="ShortDescription" value="${ShortDescription}"/>
-                            <token key="DistName" value="kinoath"/>
-                            <token key="AppName" value="KinOath"/>
-                            <token key="MainClass" value="nl.mpi.kinnate.ui.MainFrame"/>
+                            <token key="FilenameIdentifier" value="${application.branch}"/>
+                            <token key="ApplicationTitle" value="${application.title}"/>
+                            <token key="LongDescription" value="${application.longDescription}"/>
+                            <token key="ShortDescription" value="${application.shortDescription}"/>
+                            <token key="DistName" value="${APPNAME}"/>
+                            <token key="AppName" value="${application.title}"/>
+                            <token key="MainClass" value="${application.mainClass}"/>
                         </replacetokens>
                     </filterchain>
                 </copy>
@@ -97,9 +97,9 @@ http://www.lat-mpi.eu/tools/imdi/kinoath/"/>
         <updateSingleFile fileName="win-installer.iss"/>
         <updateSingleFile fileName="Info.plist"/>
         <updateSingleFile fileName="start"/>
-        <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${SRCDIR}/JNLP-INF/application.jnlp"/>
+        <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${SRCDIR}/JNLP-INF/${APPNAME}.jnlp"/>
     </target>
-    <target name="buildWindowsInstaller" depends="signkinoath">
+    <target name="buildWindowsInstaller" depends="signapplication">
         <!--check that the icon exists and fail if not-->
         <available file="${IconsDir}${application.icon-file-name}.ico" property="installedIconAvail"/>
         <fail unless="installedIconAvail" message="${application.icon-file-name}.ico doesn't exist!"/>
@@ -115,137 +115,63 @@ http://www.lat-mpi.eu/tools/imdi/kinoath/"/>
         <exec dir="${OUTPUTDIR}" executable="wine" ><!--os="Windows NT"-->
             <arg line='"C:\Program Files\Inno Setup 5\iscc.exe" ./distribution/win-installer.iss'/>
         </exec>
-        <delete dir="${OUTPUTDIR}/distribution-win32/kinoath${application.versionidentifier}-installer.zip"/>
-        <zip destfile="${OUTPUTDIR}/distribution-win32/kinoath${application.versionidentifier}-installer.zip" >
-            <file file="${OUTPUTDIR}/distribution-win32/kinoath-installer-${application.current.major}-${application.current.minor}-${application.current.revision}.exe"/>
+        <delete dir="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip"/>
+        <zip destfile="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" >
+            <file file="${OUTPUTDIR}/distribution-win32/${APPNAME}-installer-${application.majorVersion}-${application.minorVersion}-${application.revision}.exe"/>
         </zip>
-        <available file="${OUTPUTDIR}/distribution-win32/kinoath${application.versionidentifier}-installer.zip" property="installerZipMissing"/>
-        <fail unless="installerZipMissing" message="kinoath${application.versionidentifier}-installer.zip doesn't exist! Is Inno Setup installed inside wine?"/>
+        <available file="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" property="installerZipMissing"/>
+        <fail unless="installerZipMissing" message="${APPNAME}${application.branch}-installer.zip doesn't exist! Is Inno Setup installed inside wine?"/>
     </target>
-    <target name="buildMacInstaller" depends="signkinoath">
+    <target name="buildMacInstaller" depends="signapplication">
         <!--check that the icon exists and fail if not-->
-        <available file="${IconsDir}kinoath${application.versionidentifier}.icns" property="installedIconAvail"/>
-        <fail unless="installedIconAvail" message="kinoath${application.versionidentifier}.icns doesn't exist!"/>
-        <copy file="${OUTPUTDIR}/distribution/Info.plist" todir="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}.app/Contents/"/>
-        <copy file="${OUTPUTDIR}/distribution/start" todir="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}.app/Contents/MacOS/"/>
-        <copy file="${IconsDir}kinoath${application.versionidentifier}.icns" todir="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}.app/Contents/Resources/"/>
-        <copy file="${OUTPUTDIR}/${DistJarName}" todir="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}.app/Contents/MacOS/"/>
-        <copy todir="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}.app/Contents/MacOS/lib/">
+        <available file="${IconsDir}${APPNAME}${application.branch}.icns" property="installedIconAvail"/>
+        <fail unless="installedIconAvail" message="${APPNAME}${application.branch}.icns doesn't exist!"/>
+        <copy file="${OUTPUTDIR}/distribution/Info.plist" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/"/>
+        <copy file="${OUTPUTDIR}/distribution/start" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/"/>
+        <copy file="${IconsDir}${APPNAME}${application.branch}.icns" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/Resources/"/>
+        <copy file="${OUTPUTDIR}/${DistJarName}" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/"/>
+        <copy todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/lib/">
             <fileset dir="${OUTPUTDIR}/lib/" includes="*.jar"/>
         </copy>
-        <chmod file="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}.app/Contents/MacOS/start" perm="a+xr"/>
-        <tar destfile="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}-mac.tar">
+        <chmod file="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/start" perm="a+xr"/>
+        <tar destfile="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}-mac.tar">
             <tarfileset dir="${OUTPUTDIR}/distribution-mac/" filemode="755" username="ant" group="ant">
-                <include name="kinoath${application.versionidentifier}.app/Contents/MacOS/start"/>
+                <include name="${APPNAME}${application.branch}.app/Contents/MacOS/start"/>
             </tarfileset>
             <tarfileset dir="${OUTPUTDIR}/distribution-mac/" filemode="664" username="ant" group="ant">
-                <include name="kinoath${application.versionidentifier}.app/**"/>
-                <exclude name="kinoath${application.versionidentifier}.app/Contents/MacOS/start"/>
+                <include name="${APPNAME}${application.branch}.app/**"/>
+                <exclude name="${APPNAME}${application.branch}.app/Contents/MacOS/start"/>
             </tarfileset>
         </tar>
     </target>
-    <target name="getsvnversion" depends="setproperties">
-       <!-- <exec executable="svn" output="version.info">
-            <arg value="info"/>
-        </exec>
-        <exec executable="grep" output="version.date">-->
-            <!--<arg value="^Revision"/>-->
-           <!-- <arg value="^Last Changed Date:"/>
-            <arg value="version.info"/>
-        </exec>-->
-        <!--<exec executable="date" output="version.date" />-->
-        <exec outputproperty="application.current.revision" executable="svnversion">
-            <arg line="-n -c" />
-            <arg line="${SRCDIR}nl/mpi/kinnate/" />
-            <redirector>
-                <outputfilterchain>
-                    <tokenfilter>
-                        <replaceregex pattern="^[0-9]*:" replace="" flags="g"/>
-                        <replaceregex pattern="[^0-9]*" replace="" flags="g"/>
-                    </tokenfilter>
-                </outputfilterchain>
-            </redirector>
-        </exec>
-        <exec outputproperty="kinoath.info.all" executable="svn">
-            <arg line="info" />
-            <arg line="${SRCDIR}nl/mpi/kinnate/" />
-            <redirector>
-                <outputfilterchain>
-                    <tokenfilter>
-                        <replaceregex pattern="^" replace="\\\\n" flags="g"/>
-                    </tokenfilter>
-                    <striplinebreaks/>
-                </outputfilterchain>
-            </redirector>
-        </exec>
-        <exec outputproperty="kinoath.last.commit.date" executable="svn">
-            <arg line="info" />
-            <arg line="${SRCDIR}nl/mpi/kinnate/" />
-            <redirector>
-                <outputfilterchain>
-                    <linecontainsregexp>
-                        <regexp pattern="^Last Changed Date:" />
-                    </linecontainsregexp>
-                    <tokenfilter>
-                        <replaceregex pattern=".*\/([^\/]+)$" replace="\1" flags="g"/>
-                    </tokenfilter>
-                </outputfilterchain>
-            </redirector>
-        </exec>
-        <exec outputproperty="kinoath.build.date" executable="date" />
-        <echo file="${SRCDIR}nl/mpi/kinnate/KinOathVersion.java" append="false">package nl.mpi.kinnate;
-
-import nl.mpi.arbil.util.ApplicationVersion;
-
-public class KinOathVersion extends ApplicationVersion {
-
-    /**
-     * GENERATED BY ANT - DO NOT EDIT. See the arbil.xml build script.
-     */
-    public KinOathVersion() {
-    	applicationTitle = "${application.displaytitle}";
-    	applicationIconName = "/nl/mpi/kinnate/resources/icons/${application.icon-file-name}.png";
-    	currentMajor = "${application.current.major}";
-    	currentMinor = "${application.current.minor}";
-    	currentRevision = "${application.current.revision}";
-	lastCommitDate = "${kinoath.last.commit.date}";
-	compileDate = "${kinoath.build.date}";
-	fullInfo = "${kinoath.info.all}";
-    	currentVersionFile = "http://www.mpi.nl/tg/j2se/jnlp/kinoath/kinoath${application.versionidentifier}-current.txt";
-    }
-}
-        </echo>
-        <property name="KinOathJarPrefix" value="kinoath${application.versionidentifier}-${application.current.major}-${application.current.minor}-${application.current.revision}"/>
-        <property name="DistJarName" value="${KinOathJarPrefix}.jar"/>
-    </target>
-    <target name="signkinoath" depends="maven-jar">
+    <target name="signapplication" depends="maven-jar">
         <input message="Please enter the latsoftware password:" addproperty="latsoftware.pw">
             <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
         </input>
-        <signjar keystore="${pathToMpiTrunk}cert/mpi.keystore"
+        <signjar keystore="${KeyStoreLocation}"
         alias="latsoftware's max-planck-gesellschaft id" storepass="${latsoftware.pw}">
             <path>
                 <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar" />
             </path>
         </signjar>
         <signjar jar="${OUTPUTDIR}/${DistJarName}"
-        keystore="${pathToMpiTrunk}cert/mpi.keystore"
+        keystore="${KeyStoreLocation}"
         alias="latsoftware's max-planck-gesellschaft id" storepass="${latsoftware.pw}" />
     </target>
    <!-- <target name="image" depends="setproperties">
         <signjar jar="${OUTPUTDIR}/lib/typecheck-1.5.16185.jar"
         keystore="${SRCDIR}/../../../trunk/cert/mpi.keystore"
-        alias="latsoftware's max-planck-gesellschaft id" storepass="" />
+        alias="latsoftware's max-planck-gesellschaft id" storepass="koekoek" />
     </target> -->
-    <target name="GetTracTodoList" depends="getsvnversion, GetLoginData">
+    <target name="GetTracTodoList" depends="GetLoginData">
 <!--        todo: add another file for the rss feed of completed tasks-->        
-        <property name="TodoListFile" value="${OUTPUTDIR}/distribution/kinoath${application.versionidentifier}_${application.current.major}.${application.current.minor}-${application.current.revision}_todo.csv"/>
-        <get src="https://trac.mpi.nl/query?status=accepted&amp;status=assigned&amp;status=new&amp;status=reopened&amp;component=KinOath-desktop&amp;component=KinOath-web&amp;format=csv&amp;max=1000&amp;col=id&amp;col=summary&amp;col=component&amp;report=24&amp;order=summary"
+        <property name="TodoListFile" value="${OUTPUTDIR}/distribution/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_todo.csv"/>
+        <get src="https://trac.mpi.nl/query?status=accepted&amp;status=assigned&amp;status=new&amp;status=reopened&amp;component=${APPNAME}-desktop&amp;component=${APPNAME}-web&amp;format=csv&amp;max=1000&amp;col=id&amp;col=summary&amp;col=component&amp;report=24&amp;order=summary"
     dest="${TodoListFile}"
     username="${lux09.user}"
     password="${lux09.pw}"/>
-        <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
-        <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath-all_todo.csv"/> <!-- ${application.versionidentifier}-->
+        <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-all_todo.csv"/> <!-- ${application.branch}-->
     </target>
     <target name="GetLoginData">
         <input message="Please enter lux09 username:" addproperty="lux09.user" />
@@ -254,52 +180,61 @@ public class KinOathVersion extends ApplicationVersion {
         </input>
     </target>
     <target name="scp_to_lux09" depends="makeDebPackage, buildWindowsInstaller, buildMacInstaller, GetLoginData, GetTracTodoList">
-        <echo file="${OUTPUTDIR}/kinoath${application.versionidentifier}-current.txt">${application.current.revision}</echo>
-        <scp file="${OUTPUTDIR}/${DistJarName}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
+        <echo file="${OUTPUTDIR}/${APPNAME}${application.branch}-current.txt">${application.revision}</echo>
+        <scp file="${OUTPUTDIR}/${DistJarName}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- the lib direcory only needs to be updated when there is a real change so can be commented out to save build time -->
-        <scp todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/lib">
+        <scp todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/lib">
             <fileset dir="${OUTPUTDIR}/lib"/>
         </scp>
-        <scp file="${IconsDir}${application.icon-file-name}.png" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
-        <!-- push the updated the applet html and the kinoath jnlp files to the server -->
-        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath${application.versionidentifier}.jnlp"/>
+        <scp file="${IconsDir}${application.icon-file-name}.png" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <!-- push the updated the applet html and the ${APPNAME} jnlp files to the server -->
+        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}.jnlp"/>
         <!-- the non numbered version of the jnlp will allow the user to always get the latest update of that type. Whereas the build numbered version is of no use because it will always redirect to the latest version of its type not the version of the file name -->
-<!--        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath${application.versionidentifier}_${application.current.major}.${application.current.minor}-${application.current.revision}.jnlp"/>-->
-<!--        <scp file= "${BUILDDIR}/kinoath-applet.html" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath-applet${application.versionidentifier}.html"/>-->
+<!--        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>-->
+<!--        <scp file= "${BUILDDIR}/${APPNAME}-applet.html" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-applet${application.branch}.html"/>-->
         <!-- push the deb package -->
-        <scp file="${distributionDirectory}/kinoath${application.versionidentifier}_${application.current.major}.${application.current.minor}-${application.current.revision}_all.deb" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
-        <scp file="${distributionDirectory}/kinoath${application.versionidentifier}_${application.current.major}.${application.current.minor}-${application.current.revision}_all.deb" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath${application.versionidentifier}.deb"/>
+        <scp file="${distributionDirectory}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_all.deb" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${distributionDirectory}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_all.deb" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}.deb"/>
         <!-- push the windows installer -->
-        <scp file="${OUTPUTDIR}/distribution-win32/kinoath${application.versionidentifier}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
-        <scp file="${OUTPUTDIR}/distribution-win32/kinoath${application.versionidentifier}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath${application.versionidentifier}_${application.current.major}.${application.current.minor}-${application.current.revision}-win-installer.zip"/>
+        <scp file="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}-win-installer.zip"/>
         <!-- push the mac installer -->
-        <scp file="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
-        <scp file="${OUTPUTDIR}/distribution-mac/kinoath${application.versionidentifier}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath${application.versionidentifier}_${application.current.major}.${application.current.minor}-${application.current.revision}-mac.tar"/>
+        <scp file="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}-mac.tar"/>
         <!-- only after all the installers have been pushed do we update the version text file -->
-        <scp file="${OUTPUTDIR}/kinoath${application.versionidentifier}-current.txt" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/"/>
+        <scp file="${OUTPUTDIR}/${APPNAME}${application.branch}-current.txt" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- copy the current version of allversionslisting.php to make sure it gets kept in svn -->
-        <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/allversionslisting.php" todir="../desktop/src/main/php/" />
-        <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/kinoath/todolisttable.php" todir="../desktop/src/main/php/" />
-        <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="chmod a+r /data/extweb1/docs/TG/j2se/jnlp/kinoath/kinoath*" verbose="true" />
+        <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/allversionslisting.php" todir="${application.baseDir}/src/main/php/" />
+        <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/todolisttable.php" todir="${application.baseDir}/src/main/php/" />
+        <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="chmod a+r /data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}*" verbose="true" />
     </target>
+    <target name="maven-compile" depends="setproperties">
+        <!-- while this could be done in a maven ant task, this method appears more portable at this stage -->
+        <exec dir="${application.baseDir}" executable="mvn" failonerror="true">
+            <arg line="clean compile" />
+            <arg line="-Doutput.directory=${OUTPUTDIR}"/>
+        </exec>
+    </target>    
     <target name="maven-jar" depends="updateJnlpAndAppletHtml">
         <!-- while this could be done in a maven ant task, this method appears more portable at this stage -->
-        <exec dir="../desktop/" executable="mvn">
-            <arg line="clean install" />
-            <arg line="-Doutput.jarname=${KinOathJarPrefix}"/>
+        <exec dir="${application.baseDir}" executable="mvn" failonerror="true">
+            <arg line="package" />
+            <arg line="-Doutput.jarname=${JarPrefix}"/>
             <arg line="-Doutput.directory=${OUTPUTDIR}"/>
         </exec>
     </target>
-    <target name="maven-deploy" depends="getsvnversion">
+    <target name="maven-deploy" depends="maven-jar">
         <!-- while this could be done in a maven and task, this method appears more portable at this stage -->
-        <exec executable="mvn">
+        <exec dir="${application.baseDir}" executable="mvn" failonerror="true">
             <arg line="install:install-file" />
             <arg line="-Dfile=${OUTPUTDIR}/${DistJarName}" />
+<!--
             <arg line="-DgroupId=nl.mpi" />
-            <arg line="-DartifactId=kinoath" />
-            <arg line="-Dversion=${application.current.major}.${application.current.minor}.${application.current.revision}" />
+            <arg line="-DartifactId=${APPNAME}" />
+            <arg line="-Dversion=${application.majorVersion}.${application.minorVersion}.${application.revision}" />
+-->
             <arg line="-Dpackaging=jar" />
-            <arg line="-DpomFile=../desktop/pom.xml" />
+            <arg line="-DpomFile=${application.baseDir}pom.xml" />
             <!-- -DgeneratePom=true -->
         </exec>
     </target>
