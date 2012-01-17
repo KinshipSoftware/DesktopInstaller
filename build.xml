@@ -11,7 +11,7 @@
         <property name="APPNAME" value="${application.name}" />
         <property name="SRCDIR" value="${application.baseDir}src/main/java/"/>
         <property name="IconsDir" value="${application.baseDir}${application.iconsDir}"/>
-        <property name="OUTPUTDIR" value="${user.home}/Desktop/${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x/"/>
+        <property name="OUTPUTDIR" value="./target"/>
         <property name="LIBDIR" value="${OUTPUTDIR}lib/"/>
         <property name="KeyStoreLocation" value="${application.baseDir}${mpi.keystorelocation}" />
         <property name="TypeCheckVersion" value="1.6.5" />
@@ -236,6 +236,12 @@
             <arg line="-Dpackaging=jar" />
             <arg line="-DpomFile=${application.baseDir}pom.xml" />
             <!-- -DgeneratePom=true -->
+        </exec>
+    </target>
+    <target name="maven-clean" depends="setproperties">
+        <exec dir="${application.baseDir}" executable="mvn" failonerror="true">
+            <arg line="clean" />
+            <arg line="-Doutput.directory=${OUTPUTDIR}"/>
         </exec>
     </target>
 </project>
