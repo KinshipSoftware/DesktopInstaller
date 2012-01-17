@@ -9,11 +9,11 @@
     <target name="setproperties">
         <loadproperties srcfile="../application.properties" />
         <property name="APPNAME" value="${application.name}" />
-        <property name="SRCDIR" value="${application.baseDir}src/main/java/"/>
-        <property name="IconsDir" value="${application.baseDir}${application.iconsDir}"/>
-        <property name="OUTPUTDIR" value="./target"/>
-        <property name="LIBDIR" value="${OUTPUTDIR}lib/"/>
-        <property name="KeyStoreLocation" value="${application.baseDir}${mpi.keystorelocation}" />
+        <property name="SRCDIR" location="${application.baseDir}src/main/java/"/>
+        <property name="IconsDir" location="${application.baseDir}${application.iconsDir}"/>
+        <property name="OUTPUTDIR" location="./target"/>
+        <property name="LIBDIR" location="${OUTPUTDIR}lib/"/>
+        <property name="KeyStoreLocation" location="${application.baseDir}${mpi.keystorelocation}" />
         <property name="TypeCheckVersion" value="1.6.5" />
         <property name="application.icon-file-name" value="${APPNAME}${application.branch}128x128"/>
     </target>
