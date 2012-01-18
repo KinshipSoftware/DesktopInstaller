@@ -10,17 +10,18 @@
         <loadproperties srcfile="../application.properties" />
         <property name="APPNAME" value="${application.name}" />
         <property name="SRCDIR" location="${application.baseDir}src/main/java/"/>
-        <property name="IconsDir" location="${application.baseDir}${application.iconsDir}"/>
         <property name="OUTPUTDIR" location="./target"/>
-        <property name="LIBDIR" location="${OUTPUTDIR}lib/"/>
+        <property name="LIBDIR" location="${OUTPUTDIR}/lib/"/>
+        <property name="IconsDir" location="${application.baseDir}${application.iconsDir}"/>
+        <property name="ClassDir" location="${application.baseDir}/target/classes" />
         <property name="KeyStoreLocation" location="${application.baseDir}${mpi.keystorelocation}" />
         <property name="TypeCheckVersion" value="1.6.5" />
-        <property name="application.icon-file-name" value="${APPNAME}${application.branch}128x128"/>
     </target>
     <target name="loadproperties" depends="maven-compile">
         <loadproperties srcfile="../target/classes/version.properties" />
-        <property name="JarPrefix" value="${APPNAME}${application.branch}-${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
+        <property name="JarPrefix" value="${APPNAME}-${application.branch}-${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
         <property name="DistJarName" value="${JarPrefix}.jar"/>
+        <property name="application.icon-file-name" value="${APPNAME}-${application.branch}128x128"/>
     </target>
     <target name="clean" description="remove all artifact files" depends="setproperties">
         <delete dir="${OUTPUTDIR}"/>
@@ -33,12 +34,12 @@
     <!-- http://code.google.com/p/ant-deb-task/ -->
     <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant-deb.classpath"/>
     <taskdef name="desktopEntry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant-deb.classpath"/>
-    <target name="makeDebPackage" depends="maven-jar" description="build the deb file">
-        <property name="package.name" value="${APPNAME}${application.branch}"/>
+    <target name="makeDebPackage" depends="signapplication" description="build the deb file">
+        <property name="package.name" value="${APPNAME}-${application.branch}"/>
         <property name="package.jarname" value="${DistJarName}"/>
         <!--check that the icon exists and fail if not-->
-        <available file="${IconsDir}${application.icon-file-name}.png" property="packageIconAvail"/>
-        <fail unless="packageIconAvail" message="${IconsDir}${application.icon-file-name}.png doesn't exist!"/>
+        <available file="${IconsDir}/${application.icon-file-name}.png" property="packageIconAvail"/>
+        <fail unless="packageIconAvail" message="${IconsDir}/${application.icon-file-name}.png doesn't exist!"/>
         <property name="distributionDirectory" value="${OUTPUTDIR}/distribution"/>
         <mkdir dir="${distributionDirectory}"/>
         <desktopEntry
@@ -60,7 +61,7 @@
             <maintainer name="Peter Withers" email="Peter.Withers@mpi.nl"/>
             <description synopsis="${application.shortDescription}">${application.longDescription}</description>
             <tarfileset file="${OUTPUTDIR}/${package.jarname}" prefix="usr/share/${package.name}"/>
-            <tarfileset file="${IconsDir}${application.icon-file-name}.png" prefix="usr/share/${package.name}"/>
+            <tarfileset file="${IconsDir}/${application.icon-file-name}.png" prefix="usr/share/${package.name}"/>
             <tarfileset dir="${LIBDIR}" prefix="usr/share/${package.name}/lib">
                 <include name="*.jar"/>
             </tarfileset>
@@ -81,7 +82,7 @@
                             <token key="BuildDirectory" value="${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x"/>
                             <token key="InstalledIcon" value="${application.icon-file-name}"/>
                             <token key="TypeCheckVersion" value="${TypeCheckVersion}"/>
-                            <token key="FilenameIdentifier" value="${application.branch}"/>
+                            <token key="FilenameIdentifier" value="-${application.branch}"/>
                             <token key="ApplicationTitle" value="${application.title}"/>
                             <token key="LongDescription" value="${application.longDescription}"/>
                             <token key="ShortDescription" value="${application.shortDescription}"/>
@@ -97,15 +98,15 @@
         <updateSingleFile fileName="win-installer.iss"/>
         <updateSingleFile fileName="Info.plist"/>
         <updateSingleFile fileName="start"/>
-        <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${SRCDIR}/JNLP-INF/${APPNAME}.jnlp"/>
+        <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${ClassDir}/JNLP-INF/${APPNAME}.jnlp"/>
     </target>
     <target name="buildWindowsInstaller" depends="signapplication">
         <!--check that the icon exists and fail if not-->
-        <available file="${IconsDir}${application.icon-file-name}.ico" property="installedIconAvail"/>
+        <available file="${IconsDir}/${application.icon-file-name}.ico" property="installedIconAvail"/>
         <fail unless="installedIconAvail" message="${application.icon-file-name}.ico doesn't exist!"/>
         <mkdir dir="${OUTPUTDIR}/distribution-win32/temp/"/>
         <copy todir="${OUTPUTDIR}/distribution-win32/temp/">
-            <fileset dir="${IconsDir}" includes="*.ico"/>
+            <fileset dir="${IconsDir}/" includes="*.ico"/>
         </copy>
         <!--get unzip then delete the imagemagick jar-->
 <!--        <get src="http://www.mpi.nl/tg/j2se/jnlp/kinoath/lib/ImageMagick-6.5.9-Win32.jar" dest="${OUTPUTDIR}/ImageMagick-6.5.9-Win32.jar"/>
@@ -115,32 +116,32 @@
         <exec dir="${OUTPUTDIR}" executable="wine" ><!--os="Windows NT"-->
             <arg line='"C:\Program Files\Inno Setup 5\iscc.exe" ./distribution/win-installer.iss'/>
         </exec>
-        <delete dir="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip"/>
-        <zip destfile="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" >
+        <delete dir="${OUTPUTDIR}/distribution-win32/${APPNAME}-${application.branch}-installer.zip"/>
+        <zip destfile="${OUTPUTDIR}/distribution-win32/${APPNAME}-${application.branch}-installer.zip" >
             <file file="${OUTPUTDIR}/distribution-win32/${APPNAME}-installer-${application.majorVersion}-${application.minorVersion}-${application.revision}.exe"/>
         </zip>
-        <available file="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" property="installerZipMissing"/>
-        <fail unless="installerZipMissing" message="${APPNAME}${application.branch}-installer.zip doesn't exist! Is Inno Setup installed inside wine?"/>
+        <available file="${OUTPUTDIR}/distribution-win32/${APPNAME}-${application.branch}-installer.zip" property="installerZipMissing"/>
+        <fail unless="installerZipMissing" message="${APPNAME}-${application.branch}-installer.zip doesn't exist! Is Inno Setup installed inside wine?"/>
     </target>
     <target name="buildMacInstaller" depends="signapplication">
         <!--check that the icon exists and fail if not-->
-        <available file="${IconsDir}${APPNAME}${application.branch}.icns" property="installedIconAvail"/>
-        <fail unless="installedIconAvail" message="${APPNAME}${application.branch}.icns doesn't exist!"/>
+        <available file="${IconsDir}/${APPNAME}-${application.branch}.icns" property="installedIconAvail"/>
+        <fail unless="installedIconAvail" message="${APPNAME}-${application.branch}.icns doesn't exist!"/>
         <copy file="${OUTPUTDIR}/distribution/Info.plist" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/"/>
-        <copy file="${OUTPUTDIR}/distribution/start" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/"/>
-        <copy file="${IconsDir}${APPNAME}${application.branch}.icns" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/Resources/"/>
-        <copy file="${OUTPUTDIR}/${DistJarName}" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/"/>
-        <copy todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/lib/">
+        <copy file="${OUTPUTDIR}/distribution/start" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/MacOS/"/>
+        <copy file="${IconsDir}/${APPNAME}-${application.branch}.icns" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/Resources/"/>
+        <copy file="${OUTPUTDIR}/${DistJarName}" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/MacOS/"/>
+        <copy todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/MacOS/lib/">
             <fileset dir="${OUTPUTDIR}/lib/" includes="*.jar"/>
         </copy>
-        <chmod file="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/MacOS/start" perm="a+xr"/>
-        <tar destfile="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}-mac.tar">
+        <chmod file="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/MacOS/start" perm="a+xr"/>
+        <tar destfile="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}-mac.tar">
             <tarfileset dir="${OUTPUTDIR}/distribution-mac/" filemode="755" username="ant" group="ant">
-                <include name="${APPNAME}${application.branch}.app/Contents/MacOS/start"/>
+                <include name="${APPNAME}-${application.branch}.app/Contents/MacOS/start"/>
             </tarfileset>
             <tarfileset dir="${OUTPUTDIR}/distribution-mac/" filemode="664" username="ant" group="ant">
-                <include name="${APPNAME}${application.branch}.app/**"/>
-                <exclude name="${APPNAME}${application.branch}.app/Contents/MacOS/start"/>
+                <include name="${APPNAME}-${application.branch}.app/**"/>
+                <exclude name="${APPNAME}-${application.branch}.app/Contents/MacOS/start"/>
             </tarfileset>
         </tar>
     </target>
@@ -158,14 +159,9 @@
         keystore="${KeyStoreLocation}"
         alias="latsoftware's max-planck-gesellschaft id" storepass="${latsoftware.pw}" />
     </target>
-   <!-- <target name="image" depends="setproperties">
-        <signjar jar="${OUTPUTDIR}/lib/typecheck-1.5.16185.jar"
-        keystore="${SRCDIR}/../../../trunk/cert/mpi.keystore"
-        alias="latsoftware's max-planck-gesellschaft id" storepass="koekoek" />
-    </target> -->
     <target name="GetTracTodoList" depends="GetLoginData">
 <!--        todo: add another file for the rss feed of completed tasks-->        
-        <property name="TodoListFile" value="${OUTPUTDIR}/distribution/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_todo.csv"/>
+        <property name="TodoListFile" value="${OUTPUTDIR}/distribution/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_todo.csv"/>
         <get src="https://trac.mpi.nl/query?status=accepted&amp;status=assigned&amp;status=new&amp;status=reopened&amp;component=${APPNAME}-desktop&amp;component=${APPNAME}-web&amp;format=csv&amp;max=1000&amp;col=id&amp;col=summary&amp;col=component&amp;report=24&amp;order=summary"
     dest="${TodoListFile}"
     username="${lux09.user}"
@@ -180,29 +176,29 @@
         </input>
     </target>
     <target name="scp_to_lux09" depends="makeDebPackage, buildWindowsInstaller, buildMacInstaller, GetLoginData, GetTracTodoList">
-        <echo file="${OUTPUTDIR}/${APPNAME}${application.branch}-current.txt">${application.revision}</echo>
+        <echo file="${OUTPUTDIR}/${APPNAME}-${application.branch}-current.txt">${application.revision}</echo>
         <scp file="${OUTPUTDIR}/${DistJarName}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- the lib direcory only needs to be updated when there is a real change so can be commented out to save build time -->
         <scp todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/lib">
             <fileset dir="${OUTPUTDIR}/lib"/>
         </scp>
-        <scp file="${IconsDir}${application.icon-file-name}.png" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${IconsDir}/${application.icon-file-name}.png" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- push the updated the applet html and the ${APPNAME} jnlp files to the server -->
-        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}.jnlp"/>
+        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}.jnlp"/>
         <!-- the non numbered version of the jnlp will allow the user to always get the latest update of that type. Whereas the build numbered version is of no use because it will always redirect to the latest version of its type not the version of the file name -->
-<!--        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>-->
-<!--        <scp file= "${BUILDDIR}/${APPNAME}-applet.html" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-applet${application.branch}.html"/>-->
+<!--        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>-->
+<!--        <scp file= "${BUILDDIR}/${APPNAME}-applet.html" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-applet-${application.branch}.html"/>-->
         <!-- push the deb package -->
-        <scp file="${distributionDirectory}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_all.deb" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
-        <scp file="${distributionDirectory}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_all.deb" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}.deb"/>
+        <scp file="${distributionDirectory}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_all.deb" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${distributionDirectory}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_all.deb" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}.deb"/>
         <!-- push the windows installer -->
-        <scp file="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
-        <scp file="${OUTPUTDIR}/distribution-win32/${APPNAME}${application.branch}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}-win-installer.zip"/>
+        <scp file="${OUTPUTDIR}/distribution-win32/${APPNAME}-${application.branch}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${OUTPUTDIR}/distribution-win32/${APPNAME}-${application.branch}-installer.zip" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}-win-installer.zip"/>
         <!-- push the mac installer -->
-        <scp file="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
-        <scp file="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}-mac.tar"/>
+        <scp file="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}-mac.tar" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}-mac.tar"/>
         <!-- only after all the installers have been pushed do we update the version text file -->
-        <scp file="${OUTPUTDIR}/${APPNAME}${application.branch}-current.txt" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${OUTPUTDIR}/${APPNAME}-${application.branch}-current.txt" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- copy the current version of allversionslisting.php to make sure it gets kept in svn -->
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/allversionslisting.php" todir="${application.baseDir}/src/main/php/" />
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/todolisttable.php" todir="${application.baseDir}/src/main/php/" />
