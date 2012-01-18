@@ -18,7 +18,7 @@
         <property name="TypeCheckVersion" value="1.6.5" />
     </target>
     <target name="loadproperties" depends="maven-compile">
-        <loadproperties srcfile="../target/classes/version.properties" />
+        <loadproperties srcfile="${ClassDir}/version.properties" />
         <property name="JarPrefix" value="${APPNAME}-${application.branch}-${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
         <property name="DistJarName" value="${JarPrefix}.jar"/>
         <property name="application.icon-file-name" value="${APPNAME}-${application.branch}128x128"/>
