@@ -127,7 +127,7 @@
         <!--check that the icon exists and fail if not-->
         <available file="${IconsDir}/${APPNAME}-${application.branch}.icns" property="installedIconAvail"/>
         <fail unless="installedIconAvail" message="${APPNAME}-${application.branch}.icns doesn't exist!"/>
-        <copy file="${OUTPUTDIR}/distribution/Info.plist" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}${application.branch}.app/Contents/"/>
+        <copy file="${OUTPUTDIR}/distribution/Info.plist" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/"/>
         <copy file="${OUTPUTDIR}/distribution/start" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/MacOS/"/>
         <copy file="${IconsDir}/${APPNAME}-${application.branch}.icns" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/Resources/"/>
         <copy file="${OUTPUTDIR}/${DistJarName}" todir="${OUTPUTDIR}/distribution-mac/${APPNAME}-${application.branch}.app/Contents/MacOS/"/>
