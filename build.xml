@@ -70,7 +70,14 @@
     </target>
 <!-- end package creation -->
     <target name="updateJnlpAndAppletHtml" depends="loadproperties">
-<!--todo: the jar name should have the application.branch included-->
+        <!--find . -name "*.jar" -exec /bin/echo <jar href=\"lib/{}\" download=\"eager\"/> ;-->
+        <exec dir="${LIBDIR}" executable="/usr/bin/find" outputproperty="libsList">
+            <arg line='. -iname "*.jar"' />
+            <arg line='-execdir /bin/echo' />
+            <arg value='        &lt;jar href="lib/{}" download="eager"/&gt;' />
+            <arg value=';' />
+        </exec>
+        
         <macrodef name="updateSingleFile">
             <attribute name="fileName"/>
             <sequential>
@@ -87,8 +94,11 @@
                             <token key="LongDescription" value="${application.longDescription}"/>
                             <token key="ShortDescription" value="${application.shortDescription}"/>
                             <token key="DistName" value="${APPNAME}"/>
+                            <token key="HeapSize" value="${application.jnlp.heapSize}"/>
+                            <token key="JavaVersion" value="${application.javaVersion}" />
                             <token key="AppName" value="${application.title}"/>
                             <token key="MainClass" value="${application.mainClass}"/>
+                            <token key="LibsList" value="${libsList}" />
                         </replacetokens>
                     </filterchain>
                 </copy>

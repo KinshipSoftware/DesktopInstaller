@@ -24,4 +24,5 @@ application.iconsDir=src/main/resources/nl/mpi/arbil/resources/icons/
 # location of mpi.keystore file, relative to the application baseDir
 mpi.keystorelocation=../../../trunk/cert/mpi.keystore
 
+# zip at the following URI contains a portable distribution of ImageMagick that has to be included in the Windows installer
 application.winUtilsLocation=http://www.mpi.nl/tg/j2se/jnlp/arbil/lib/arbil-winutils.zip
