@@ -100,19 +100,22 @@
         <updateSingleFile fileName="start"/>
         <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${ClassDir}/JNLP-INF/${APPNAME}.jnlp"/>
     </target>
+    <target name="copyWinUtils" if="application.winUtilsLocation" depends="setproperties">
+        <get src="${application.winUtilsLocation}" dest="${OUTPUTDIR}/winUtils.zip"/>
+        <mkdir dir="${OUTPUTDIR}/distribution-win32/temp/utils"/>
+        <unzip src="${OUTPUTDIR}/winUtils.zip" dest="${OUTPUTDIR}/distribution-win32/temp/utils"/>
+        <delete file="${OUTPUTDIR}/winUtils.zip"/>
+    </target>
     <target name="buildWindowsInstaller" depends="signapplication">
         <!--check that the icon exists and fail if not-->
         <available file="${IconsDir}/${application.icon-file-name}.ico" property="installedIconAvail"/>
         <fail unless="installedIconAvail" message="${application.icon-file-name}.ico doesn't exist!"/>
-        <mkdir dir="${OUTPUTDIR}/distribution-win32/temp/"/>
+        <mkdir dir="${OUTPUTDIR}/distribution-win32/temp"/>
         <copy todir="${OUTPUTDIR}/distribution-win32/temp/">
             <fileset dir="${IconsDir}/" includes="*.ico"/>
         </copy>
-        <!--get unzip then delete the imagemagick jar-->
-<!--        <get src="http://www.mpi.nl/tg/j2se/jnlp/kinoath/lib/ImageMagick-6.5.9-Win32.jar" dest="${OUTPUTDIR}/ImageMagick-6.5.9-Win32.jar"/>
-        <unzip src="${OUTPUTDIR}/ImageMagick-6.5.9-Win32.jar" dest="${OUTPUTDIR}/distribution-win32/temp/ImageMagick"/>
-        <delete file="${OUTPUTDIR}/ImageMagick-6.5.9-Win32.jar"/>
-        <delete dir="${OUTPUTDIR}/distribution-win32/temp/ImageMagick/META-INF"/>-->
+        <!--get and unzip utilities zip, e.g. imagemagick -->
+        <antcall target="copyWinUtils" />
         <exec dir="${OUTPUTDIR}" executable="wine" ><!--os="Windows NT"-->
             <arg line='"C:\Program Files\Inno Setup 5\iscc.exe" ./distribution/win-installer.iss'/>
         </exec>

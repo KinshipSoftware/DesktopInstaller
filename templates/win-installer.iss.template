@@ -50,7 +50,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 [Files]
 Source: "..\@DistJarName@"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\distribution-win32\temp\@InstalledIcon@.ico"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "..\distribution-win32\temp\ImageMagick\*"; DestDir: "{app}\ImageMagick\"; Flags: ignoreversion
+Source: "..\distribution-win32\temp\Utils\*"; DestDir: "{app}\Utils\"; Flags: ignoreversion
 ; todo: include the imagemagick sub directories
 Source: "..\lib\*"; DestDir: "{app}\lib\"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
