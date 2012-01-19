@@ -102,7 +102,6 @@
     </target>
     <target name="copyWinUtils" if="application.winUtilsLocation" depends="setproperties">
         <get src="${application.winUtilsLocation}" dest="${OUTPUTDIR}/winUtils.zip"/>
-        <mkdir dir="${OUTPUTDIR}/distribution-win32/temp/utils"/>
         <unzip src="${OUTPUTDIR}/winUtils.zip" dest="${OUTPUTDIR}/distribution-win32/temp/utils"/>
         <delete file="${OUTPUTDIR}/winUtils.zip"/>
     </target>
@@ -110,7 +109,7 @@
         <!--check that the icon exists and fail if not-->
         <available file="${IconsDir}/${application.icon-file-name}.ico" property="installedIconAvail"/>
         <fail unless="installedIconAvail" message="${application.icon-file-name}.ico doesn't exist!"/>
-        <mkdir dir="${OUTPUTDIR}/distribution-win32/temp"/>
+        <mkdir dir="${OUTPUTDIR}/distribution-win32/temp/utils"/>
         <copy todir="${OUTPUTDIR}/distribution-win32/temp/">
             <fileset dir="${IconsDir}/" includes="*.ico"/>
         </copy>
