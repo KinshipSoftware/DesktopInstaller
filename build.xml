@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <!--
- * application.xml
+ * build.xml
  * Created on 10 September 2008, 10:03
  * Modified on 21 September 2011, 14:27
  * @author Peter.Withers@mpi.nl
+ * @author Twan.Goosen@mpi.nl
 -->
 <project name="installer" default="maven-jar">
     <target name="setproperties">
