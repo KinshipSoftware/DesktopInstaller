@@ -171,13 +171,10 @@
         keystore="${KeyStoreLocation}"
         alias="latsoftware's max-planck-gesellschaft id" storepass="${latsoftware.pw}" />
     </target>
-    <target name="GetTracTodoList" depends="GetLoginData">
+    <target name="GetTracTodoList" depends="GetLoginData" if="application.todoListLocation">
 <!--        todo: add another file for the rss feed of completed tasks-->        
         <property name="TodoListFile" value="${OUTPUTDIR}/distribution/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_todo.csv"/>
-        <get src="https://trac.mpi.nl/query?status=accepted&amp;status=assigned&amp;status=new&amp;status=reopened&amp;component=${APPNAME}-desktop&amp;component=${APPNAME}-web&amp;format=csv&amp;max=1000&amp;col=id&amp;col=summary&amp;col=component&amp;report=24&amp;order=summary"
-    dest="${TodoListFile}"
-    username="${lux09.user}"
-    password="${lux09.pw}"/>
+        <get src="${application.todoListLocation}" dest="${TodoListFile}" username="${lux09.user}" password="${lux09.pw}"/>
         <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-all_todo.csv"/> <!-- ${application.branch}-->
     </target>

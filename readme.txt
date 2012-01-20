@@ -17,6 +17,9 @@ To use this installer in your project, execute the following steps:
 - Copy the file 'installer/application.properties.example' to your project
   directory as 'application.properties'. Open it in an editor, set all the
   values correctly, and put it under version control.
+- If you want to use the script to deploy to the server, download the jar
+  package for JSch from <http://www.jcraft.com/jsch/> and put it in your ant
+  lib path (e.g. ~/.ant/lib).
 
 The installer expects a file 'version.properties' to be present in the target class directory after
 compilation, with the following properties set:
