@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 		<string>@VersionNumber@</string>
 	<key>CFBundleName</key>
-		<string>@AppName@@FilenameIdentifier@</string>
+		<string>@DistName@@FilenameIdentifier@</string>
 	<key>CFBundlePackageType</key>
 		<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
