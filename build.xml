@@ -55,11 +55,11 @@
         <deb
             todir="${distributionDirectory}"
             package="${package.name}"
-            section="science"
-            depends="sun-java5-jre | sun-java6-jre, ffmpeg, imagemagick"            
+            section="${application.debian.section}"
+            depends="${application.debian.dependends}"            
         > <!-- homepage="http://www.lat-mpi.eu/tools/kinoath" deb doesn't support the "homepage" attribute -->
             <version upstream="${application.majorVersion}.${application.minorVersion}" debian="${application.revision}"/>
-            <maintainer name="Peter Withers" email="Peter.Withers@mpi.nl"/>
+            <maintainer name="${application.maintainer.name}" email="${application.maintainer.email}"/>
             <description synopsis="${application.shortDescription}">${application.longDescription}</description>
             <tarfileset file="${OUTPUTDIR}/${package.jarname}" prefix="usr/share/${package.name}"/>
             <tarfileset file="${IconsDir}/${application.icon-file-name}.png" prefix="usr/share/${package.name}"/>
