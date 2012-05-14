@@ -16,6 +16,7 @@
         <property name="IconsDir" location="${application.baseDir}${application.iconsDir}"/>
         <property name="ClassDir" location="${application.baseDir}/target/classes" />
         <property name="KeyStoreLocation" location="${application.baseDir}${mpi.keystorelocation}" />
+        <property name="KeyName" value="${mpi.keyname}" />
         <property name="TypeCheckVersion" value="1.6.5" />
     </target>
     <target name="loadproperties" depends="maven-compile">
@@ -163,14 +164,14 @@
             <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
         </input>
         <signjar keystore="${KeyStoreLocation}"
-        alias="latsoftware's max-planck-gesellschaft id" storepass="${latsoftware.pw}">
+        alias="${KeyName}" storepass="${latsoftware.pw}">
             <path>
                 <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar" />
             </path>
         </signjar>
         <signjar jar="${OUTPUTDIR}/${DistJarName}"
         keystore="${KeyStoreLocation}"
-        alias="latsoftware's max-planck-gesellschaft id" storepass="${latsoftware.pw}" />
+        alias="${KeyName}" storepass="${latsoftware.pw}" />
     </target>
     <target name="GetTracTodoList" depends="GetLoginData" if="application.todoListLocation">
 <!--        todo: add another file for the rss feed of completed tasks-->        
