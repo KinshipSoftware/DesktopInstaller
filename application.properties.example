@@ -35,4 +35,5 @@ mpi.keyname=lat-mpg
 
 # zip at the following URI contains a portable distribution of ImageMagick that has to be included in the Windows installer
 application.winUtilsLocation=http://www.mpi.nl/tg/j2se/jnlp/arbil/lib/arbil-winutils.zip
-application.todoListLocation=https://trac.mpi.nl/query?status=accepted&status=assigned&status=new&status=reopened&component=Arbil&format=csv&max=1000&col=id&col=summary&col=component&order=summary
+application.todoListLocation=https://trac.mpi.nl/query?status=accepted&status=assigned&status=new&status=reopened&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
+application.doneListLocation=https://trac.mpi.nl/query?status=closed&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone

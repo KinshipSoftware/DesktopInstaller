@@ -86,6 +86,7 @@
                 <copy overwrite="true" file="./templates/@{fileName}.template" tofile="${OUTPUTDIR}/distribution/@{fileName}">
                     <filterchain>
                         <replacetokens>
+                            <token key="JarPrefix" value="${JarPrefix}"/>
                             <token key="VersionNumber" value="${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
                             <token key="DistJarName" value="${DistJarName}"/>
                             <token key="BuildDirectory" value="${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x"/>
@@ -176,9 +177,21 @@
     <target name="GetTracTodoList" depends="GetLoginData" if="application.todoListLocation">
 <!--        todo: add another file for the rss feed of completed tasks-->        
         <property name="TodoListFile" value="${OUTPUTDIR}/distribution/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_todo.csv"/>
-        <get src="${application.todoListLocation}" dest="${TodoListFile}" username="${lux09.user}" password="${lux09.pw}"/>
+        <get src="${application.todoListLocation}" 
+	dest="${TodoListFile}" 
+	username="${lux09.user}" 
+	password="${lux09.pw}"/>
         <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <scp file="${TodoListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-all_todo.csv"/> <!-- ${application.branch}-->
+        <property name="ChangeListFile" value="${OUTPUTDIR}/distribution/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_changes.csv"/>
+        <get src="${application.doneListLocation}"
+             dest="${ChangeListFile}"
+             username="${lux09.user}"
+             password="${lux09.pw}"/>
+        <scp file="${ChangeListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
+        <scp file="${ChangeListFile}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-all_changes.csv"/> <!-- ${application.branch}-->
+<!--    generating an rss from trac exports too much information when it should only be outputting the id, date, title and milestone, so we dont do that here -->
+
     </target>
     <target name="GetLoginData">
         <input message="Please enter lux09 username:" addproperty="lux09.user" />
@@ -195,6 +208,7 @@
         </scp>
         <scp file="${IconsDir}/${application.icon-file-name}.png" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- push the updated the applet html and the ${APPNAME} jnlp files to the server -->
+        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>
         <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}.jnlp"/>
         <!-- the non numbered version of the jnlp will allow the user to always get the latest update of that type. Whereas the build numbered version is of no use because it will always redirect to the latest version of its type not the version of the file name -->
 <!--        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>-->
@@ -213,6 +227,7 @@
         <!-- copy the current version of allversionslisting.php to make sure it gets kept in svn -->
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/allversionslisting.php" todir="${application.baseDir}/src/main/php/" />
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/todolisttable.php" todir="${application.baseDir}/src/main/php/" />
+        <!-- set the required permissions for apache --> 
         <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="chmod a+r /data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}*" verbose="true" />
         <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="chmod a+r /data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/lib/*" verbose="true" />
     </target>
@@ -224,6 +239,7 @@
         </exec>
     </target>    
     <target name="maven-jar" depends="updateJnlpAndAppletHtml">
+        <!-- clean must be run before updateJnlpAndAppletHtml otherwise the jnlp file gets deleted from the classes before making the jar file -->
         <!-- while this could be done in a maven ant task, this method appears more portable at this stage -->
         <exec dir="${application.baseDir}" executable="mvn" failonerror="true">
             <arg line="package" />
