@@ -92,7 +92,7 @@
                             <token key="BuildDirectory" value="${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x"/>
                             <token key="InstalledIcon" value="${application.icon-file-name}"/>
                             <token key="TypeCheckVersion" value="${TypeCheckVersion}"/>
-                            <token key="FilenameIdentifier" value="-${application.branch}"/>
+                            <token key="FilenameIdentifier" value="_${application.branch}"/>
                             <token key="ApplicationTitle" value="${application.title}"/>
                             <token key="LongDescription" value="${application.longDescription}"/>
                             <token key="ShortDescription" value="${application.shortDescription}"/>
