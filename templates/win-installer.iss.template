@@ -60,7 +60,7 @@ Source: "..\lib\*"; DestDir: "{app}\lib\"; Flags: ignoreversion recursesubdirs c
 Name: "{group}\@ApplicationTitle@"; Filename: "javaw"; Parameters: "-classpath ""{app}\@DistJarName@;{app}\lib"" -Xmx@HeapSize@ @MainClass@"; IconFileName:"{app}\@InstalledIcon@.ico";
 Name: "{group}\{cm:ProgramOnTheWeb,@AppName@}"; Filename: "http://www.lat-mpi.eu/tools/@DistName@"
 Name: "{group}\{cm:ProgramOnTheWeb,@AppName@ Forum}"; Filename: "http://tla.mpi.nl/forums/software/@DistName@/"
-Name: "{group}\Launch @ApplicationTitle@ Via Webstart"; Filename: "http://www.mpi.nl/tg/j2se/jnlp/@DistName@/@DistName@@FilenameIdentifier@.jnlp"
+Name: "{group}\Launch @ApplicationTitle@ Via Webstart"; Filename: "http://www.mpi.nl/tg/j2se/jnlp/@DistName@/@DistName@-@Branch@.jnlp"
 Name: "{commondesktop}\@ApplicationTitle@"; Filename: "javaw"; Parameters: "-classpath ""{app}\@DistJarName@;{app}\lib"" -Xmx@HeapSize@ @MainClass@"; Tasks: desktopicon; IconFileName:"{app}\@InstalledIcon@.ico";
 ; Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\@ApplicationTitle@"; Filename: "{app}\start.bat"; Tasks: quicklaunchicon; IconFileName:"{app}\@InstalledIcon@.ico";
 

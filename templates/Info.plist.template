@@ -7,7 +7,7 @@
 	<key>CFBundleGetInfoString</key>
 		<string>@AppName@ @VersionNumber@ for Mac OS X</string>
 	<key>CFBundleIconFile</key>
-		<string>@DistName@@FilenameIdentifier@.icns</string>
+		<string>@DistName@-@Branch@.icns</string>
 	<key>CFBundleIdentifier</key>
 		<string>nl.mpi.@DistName@.@DistName@@FilenameIdentifier@</string>
 	<key>CFBundleInfoDictionaryVersion</key>
