@@ -9,11 +9,11 @@
 	<key>CFBundleIconFile</key>
 		<string>@DistName@-@Branch@.icns</string>
 	<key>CFBundleIdentifier</key>
-		<string>nl.mpi.@DistName@.@DistName@@FilenameIdentifier@</string>
+		<string>nl.mpi.@DistName@.@DistName@-@Branch@</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 		<string>@VersionNumber@</string>
 	<key>CFBundleName</key>
-		<string>@DistName@@FilenameIdentifier@</string>
+		<string>@DistName@-@Branch@</string>
 	<key>CFBundlePackageType</key>
 		<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
