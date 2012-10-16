@@ -111,7 +111,7 @@
         <updateSingleFile fileName="win-installer.iss"/>
         <updateSingleFile fileName="Info.plist"/>
         <updateSingleFile fileName="start"/>
-        <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${ClassDir}/JNLP-INF/${APPNAME}.jnlp"/>
+        <copy file="${OUTPUTDIR}/distribution/application.jnlp" tofile="${ClassDir}/JNLP-INF/APPLICATION.JNLP"/>
     </target>
     <target name="copyWinUtils" if="application.winUtilsLocation" depends="prepareWinUtilsDir">
         <get src="${application.winUtilsLocation}" dest="${OUTPUTDIR}/winUtils.zip"/>
