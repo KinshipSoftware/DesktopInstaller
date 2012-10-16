@@ -214,7 +214,7 @@
         </scp>
         <scp file="${IconsDir}/${application.icon-file-name}.png" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- push the updated the applet html and the ${APPNAME} jnlp files to the server -->
-        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>
+        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}-${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>
         <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}.jnlp"/>
         <!-- the non numbered version of the jnlp will allow the user to always get the latest update of that type. Whereas the build numbered version is of no use because it will always redirect to the latest version of its type not the version of the file name -->
         <!--        <scp file="${OUTPUTDIR}/distribution/application.jnlp" remoteTofile="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}.jnlp"/>-->
