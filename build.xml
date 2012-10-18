@@ -18,12 +18,14 @@
         <property name="KeyStoreLocation" location="${application.baseDir}${mpi.keystorelocation}" />
         <property name="KeyName" value="${mpi.keyname}" />
         <property name="TypeCheckVersion" value="1.6.5" />
+        <property name="ExternalPropertiesFile" value="${ClassDir}${application.packagePath}/version.properties" />
     </target>
     <target name="loadproperties" depends="maven-compile">
-        <loadproperties srcfile="${ClassDir}${application.packagePath}/version.properties" />
+        <loadproperties srcfile="${ExternalPropertiesFile}" />
         <property name="JarPrefix" value="${APPNAME}-${application.branch}-${application.majorVersion}-${application.minorVersion}-${application.revision}"/>
         <property name="DistJarName" value="${JarPrefix}.jar"/>
         <property name="application.icon-file-name" value="${APPNAME}-${application.branch}128x128"/>
+        <property name="WindowsLauncherExe" value="${APPNAME}-${application.branch}.exe"/> 
     </target>
     <target name="clean" description="remove all artifact files" depends="setproperties">
         <delete dir="${OUTPUTDIR}"/>
@@ -98,10 +100,13 @@
                             <token key="ShortDescription" value="${application.shortDescription}"/>
                             <token key="DistName" value="${APPNAME}"/>
                             <token key="HeapSize" value="${application.jnlp.heapSize}"/>
-                            <token key="JavaVersion" value="${application.javaVersion}" />
+                            <token key="InitialHeapSize" value="${application.installed.initialHeapSize}"/>
+                            <token key="MaxHeapSize" value="${application.installed.maxHeapSize}"/>
+                            <token key="JavaVersion" value="${application.javaTargetVersion}" />
                             <token key="AppName" value="${application.title}"/>
                             <token key="MainClass" value="${application.mainClass}"/>
                             <token key="LibsList" value="${libsList}" />
+                            <token key="WindowsLauncherExe" value="${WindowsLauncherExe}" />
                         </replacetokens>
                     </filterchain>
                 </copy>
@@ -122,7 +127,7 @@
         <mkdir dir="${OUTPUTDIR}/distribution-win32/temp/utils"/>
         <echo file="${OUTPUTDIR}/distribution-win32/temp/utils/readme.txt" append="true">Windows utils are placed here.</echo>
     </target>
-    <target name="buildWindowsInstaller" depends="signapplication">
+    <target name="buildWindowsInstaller" depends="signapplication, createWindowsLauncher">
         <!--check that the icon exists and fail if not-->
         <available file="${IconsDir}/${application.icon-file-name}.ico" property="installedIconAvail"/>
         <fail unless="installedIconAvail" message="${application.icon-file-name}.ico doesn't exist!"/>
@@ -272,6 +277,17 @@
         <exec dir="${application.baseDir}" executable="mvn" failonerror="true">
             <arg line="clean" />
             <arg line="-Doutput.directory=${OUTPUTDIR}"/>
+        </exec>
+    </target>
+    <target name="createWindowsLauncher" depends="prepareWinUtilsDir, maven-jar">
+    	 <exec dir="." executable="mvn" failonerror="true">
+            <arg line="-f launch4j-pom.xml" />
+            <arg line="package" />
+            <arg line="-Dapplication.propertiesFile=${ExternalPropertiesFile}"/>
+            <arg line="-Doutput.directory=${OUTPUTDIR}/distribution-win32/temp"/>
+            <arg line="-Dinput.jarFile=${DistJarName}" />
+            <arg line="-Dinput.iconsDir=${IconsDir}" />
+            <arg line="-Doutput.exeFile=${WindowsLauncherExe}" />
         </exec>
     </target>
 </project>

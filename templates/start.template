@@ -4,5 +4,6 @@ exec java \
 	-classpath "$BASEDIR/@DistJarName@:$BASEDIR/lib" \
 	-Xdock:name="@ApplicationTitle@" \
         -Xdock:icon="$BASEDIR/../Resources/@DistName@-@Branch@.icns" \
-        -Xmx@HeapSize@ \
+        -Xms@InitialHeapSize@M \
+        -Xmx@MaxHeapSize@M \
 	@MainClass@
