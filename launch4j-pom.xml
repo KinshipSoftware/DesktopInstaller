@@ -51,8 +51,8 @@
 					<errTitle>${application.title}</errTitle>
 					<jre>
 					  <minVersion>${application.minimalJavaVersion}</minVersion>
-					  <initialHeapSize>${application.installed.initialHeapSize}</initialHeapSize>
-					  <maxHeapSize>${application.installed.maxHeapSize}</maxHeapSize>
+					  <initialHeapSize>${application.initialHeapSize}</initialHeapSize>
+					  <maxHeapSize>${application.maxHeapSize}</maxHeapSize>
 					</jre>
 					<versionInfo>
 					  <fileVersion>${application.version}.0</fileVersion>
@@ -60,7 +60,7 @@
 					  <fileDescription>${application.shortDescription}</fileDescription>
 					  <copyright>Copyright (C) 2012, Max Planck Institute</copyright>
 					  <productVersion>${application.version}.0</productVersion>
-					  <txtProductVersion>${application.title} ${project.version}</txtProductVersion>
+					  <txtProductVersion>${application.title} ${application.version}</txtProductVersion>
 					  <productName>${application.title}</productName>
 					  <internalName>${application.name}</internalName>
 					  <originalFilename>${output.exeFile}</originalFilename>

@@ -99,9 +99,8 @@
                             <token key="LongDescription" value="${application.longDescription}"/>
                             <token key="ShortDescription" value="${application.shortDescription}"/>
                             <token key="DistName" value="${APPNAME}"/>
-                            <token key="HeapSize" value="${application.jnlp.heapSize}"/>
-                            <token key="InitialHeapSize" value="${application.installed.initialHeapSize}"/>
-                            <token key="MaxHeapSize" value="${application.installed.maxHeapSize}"/>
+                            <token key="InitialHeapSize" value="${application.initialHeapSize}"/>
+                            <token key="MaxHeapSize" value="${application.maxHeapSize}"/>
                             <token key="JavaVersion" value="${application.javaTargetVersion}" />
                             <token key="AppName" value="${application.title}"/>
                             <token key="MainClass" value="${application.mainClass}"/>

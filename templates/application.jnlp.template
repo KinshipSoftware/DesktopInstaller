@@ -22,7 +22,7 @@
     </security>
     <update check="timeout" policy="always"/>
     <resources>
-        <java max-heap-size="@HeapSize@" version="@JavaVersion@"/>
+        <java initial-heap-size="@InitialHeapSize@m" max-heap-size="@MaxHeapSize@m" version="@JavaVersion@"/>
         <jar href="@DistJarName@" main="true" download="eager"/>
 @LibsList@
         <property name="nl.mpi.webstartUpdateUrl" value="http://www.mpi.nl/tg/j2se/jnlp/@DistName@/@DistName@-@Branch@.jnlp"/>

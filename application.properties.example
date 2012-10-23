@@ -10,21 +10,30 @@ application.shortDescription=Arbil is an application for arranging research mate
 application.longDescription=Arbil is an application for arranging research material and associated metadata into a format appropriate for archiving.  Arbil is designed so that it can be used off line in remote locations. The data can be entered at any stage in part or as a whole. When an internet connection is available the work can then be transferred to the main archive via Lamus.\
                             \
                             http://www.lat-mpi.eu/tools/imdi/Arbil/
+application.maintainer.name=Peter Withers
+application.maintainer.email=Peter.Withers@mpi.nl
 
 ####################################
-# Distribution
+# Requirements
 ####################################
-# heap size for JNLP in bytes
-application.jnlp.heapSize=1073741824
-# heap size for installer in megabytes
-application.installed.initialHeapSize=256
-application.installed.maxHeapSize=1024
- 
+# heap size in megabytes
+application.initialHeapSize=256
+application.maxHeapSize=1024
+
 # Target java version (e.g. 1.5+)
 application.javaTargetVersion=1.5+
 # Minimal java version (e.g. 1.5.0)
 application.minimalJavaVersion=1.5.0
 
+####################################
+# Distribution
+####################################
+
+application.debian.dependends=sun-java5-jre | sun-java6-jre | openjdk-7-jre, ffmpeg, imagemagick
+application.debian.section=science
+
+# zip at the following URI contains a portable distribution of ImageMagick that has to be included in the Windows installer
+application.winUtilsLocation=http://www.mpi.nl/tg/j2se/jnlp/arbil/lib/arbil-winutils.zip
 
 ####################################
 # Locations
@@ -36,11 +45,14 @@ application.baseDir=../
 
 # location of icons directory, relative to the application baseDir
 application.iconsDir=src/main/resources/nl/mpi/arbil/resources/icons/
+
+application.todoListLocation=https://trac.mpi.nl/query?status=accepted&status=assigned&status=new&status=reopened&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
+application.doneListLocation=https://trac.mpi.nl/query?status=closed&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
+
+####################################
+# JAR signing
+####################################
+
 # location of mpi.keystore file, relative to the application baseDir
 mpi.keystorelocation=../../../cert/mpi.keystore
 mpi.keyname=lat-mpg
-
-# zip at the following URI contains a portable distribution of ImageMagick that has to be included in the Windows installer
-application.winUtilsLocation=http://www.mpi.nl/tg/j2se/jnlp/arbil/lib/arbil-winutils.zip
-application.todoListLocation=https://trac.mpi.nl/query?status=accepted&status=assigned&status=new&status=reopened&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
-application.doneListLocation=https://trac.mpi.nl/query?status=closed&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
