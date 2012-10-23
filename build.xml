@@ -50,7 +50,7 @@
             toFile="${distributionDirectory}/${package.name}.desktop"
             name="${application.title}"
             comment="${application.shortDescription}"
-            exec="java -jar /usr/share/${package.name}/${package.jarname}"
+            exec="java -Xms${application.initialHeapSize}m -Xmx${application.maxHeapSize}m -jar /usr/share/${package.name}/${package.jarname}"
             path="/usr/share/${package.name}/"
             icon="/usr/share/${package.name}/${application.icon-file-name}.png"
             categories="Science;Education;Java"
