@@ -210,7 +210,7 @@
     <target name="createVersionFile" depends="loadproperties">
         <echo file="${OUTPUTDIR}/${APPNAME}-${application.branch}-current.txt">${application.revision}</echo>
     </target>
-    <target name="scp_to_lux09" depends="makeDebPackage, buildWindowsInstaller, buildMacInstaller, createVersionFile, GetLoginData, GetTracTodoList">
+    <target name="scp_to_lux09" depends="clean, makeDebPackage, buildWindowsInstaller, buildMacInstaller, createVersionFile, GetLoginData, GetTracTodoList">
         <scp file="${OUTPUTDIR}/${DistJarName}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- the lib direcory only needs to be updated when there is a real change so can be commented out to save build time -->
         <scp todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/lib">
