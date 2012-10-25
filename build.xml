@@ -238,8 +238,7 @@
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/allversionslisting.php" todir="${application.baseDir}/src/main/php/" />
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/todolisttable.php" todir="${application.baseDir}/src/main/php/" />
         <!-- set the required permissions for apache --> 
-        <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="chmod a+r /data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}*" verbose="true" />
-        <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="chmod a+r /data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/lib/*" verbose="true" />
+        <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="find /data/extweb1/docs/TG/j2se/jnlp/${APPNAME} -user ${lux09.user} -follow -exec chmod a+r,g+w {} \;" verbose="true" />
     </target>
     <target name="maven-compile" depends="setproperties">
         <!-- while this could be done in a maven ant task, this method appears more portable at this stage -->
