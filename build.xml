@@ -182,7 +182,7 @@
                  keystore="${KeyStoreLocation}"
                  alias="${KeyName}" storepass="${latsoftware.pw}" />
     </target>
-    <target name="GetTracTodoList" depends="GetLoginData" if="application.todoListLocation">
+    <target name="GetTracTodoList" depends="loadproperties,GetLoginData" if="application.todoListLocation">
         <!--        todo: add another file for the rss feed of completed tasks-->        
         <property name="TodoListFile" value="${OUTPUTDIR}/distribution/${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}-${application.revision}_todo.csv"/>
         <get src="${application.todoListLocation}" 
