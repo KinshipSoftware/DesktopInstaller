@@ -60,6 +60,7 @@
             package="${package.name}"
             section="${application.debian.section}"
             depends="${application.debian.dependends}"            
+            conflicts="${application.debian.conflicts}"
         > <!-- homepage="http://www.lat-mpi.eu/tools/kinoath" deb doesn't support the "homepage" attribute -->
             <version upstream="${application.majorVersion}.${application.minorVersion}" debian="${application.revision}"/>
             <maintainer name="${application.maintainer.name}" email="${application.maintainer.email}"/>
