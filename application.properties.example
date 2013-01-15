@@ -30,6 +30,7 @@ application.minimalJavaVersion=1.5.0
 ####################################
 
 application.debian.dependends=sun-java5-jre | sun-java6-jre | openjdk-7-jre, ffmpeg, imagemagick
+application.debian.conflicts=graphicsmagick-imagemagick-compat
 application.debian.section=science
 
 # zip at the following URI contains a portable distribution of ImageMagick that has to be included in the Windows installer
@@ -45,6 +46,8 @@ application.baseDir=../
 
 # location of icons directory, relative to the application baseDir
 application.iconsDir=src/main/resources/nl/mpi/arbil/resources/icons/
+# location of release notes, relative to application baseDir
+application.releaseNotesLocation=release_notes.txt
 
 application.todoListLocation=https://trac.mpi.nl/query?status=accepted&status=assigned&status=new&status=reopened&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
 application.doneListLocation=https://trac.mpi.nl/query?status=closed&component=KinOath-desktop&milestone=!KinOath+Halle+Milestone&format=csv&max=1000&col=id&col=summary&col=milestone&col=type&report=24&order=milestone
