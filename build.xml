@@ -27,7 +27,7 @@
         <property name="application.icon-file-name" value="${APPNAME}-${application.branch}128x128"/>
         <property name="WindowsLauncherExe" value="${APPNAME}-${application.branch}.exe"/> 
     </target>
-    <target name="clean" description="remove all artifact files" depends="setproperties">
+    <target name="clean" description="remove all artifact files" depends="setproperties, maven-clean">
         <delete dir="${OUTPUTDIR}"/>
         <mkdir dir="${OUTPUTDIR}"/>
     </target>
