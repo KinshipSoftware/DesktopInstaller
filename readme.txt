@@ -17,6 +17,9 @@ To use this installer in your project, execute the following steps:
 - Copy the file 'installer/application.properties.example' to your project
   directory as 'application.properties'. Open it in an editor, set all the
   values correctly, and put it under version control.
+- To build the windows installer, you need to have Wine (<http://www.winehq.org/>)
+  installed and the Inno Setup tool installed inside Wine.
+  Inno Setup is available at <http://www.jrsoftware.org/isdl.php>
 - If you want to use the script to deploy to the server, download the jar
   package for JSch from <http://www.jcraft.com/jsch/> and put it in your ant
   lib path (e.g. ~/.ant/lib).
@@ -45,4 +48,6 @@ To use the installer script run any of the ant targets, e.g.:
 - maven-jar (will just create the jar in the target directory)
 - scp_to_lux_09 (will create the installers and deploy them on lux09)
 
-You will need Wine <http://www.winehq.org/> to build the windows installer.
+Make sure to have ant-deb-jar, Wine and Inno Setup installed if you want to
+build for the server.
+
