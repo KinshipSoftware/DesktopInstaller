@@ -3,6 +3,7 @@
  * build.xml
  * Created on 10 September 2008, 10:03
  * Modified on 21 September 2011, 14:27
+ * Modified on 8 March 2013
  * @author Peter.Withers@mpi.nl
  * @author Twan.Goosen@mpi.nl
 -->
@@ -38,6 +39,11 @@
     <!-- http://code.google.com/p/ant-deb-task/ -->
     <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant-deb.classpath"/>
     <taskdef name="desktopEntry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant-deb.classpath"/>
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+    	<classpath>
+    	    <pathelement location="/usr/share/java/ant-contrib.jar"/>
+    	</classpath>
+    </taskdef>
     <target name="makeDebPackage" depends="signapplication" description="build the deb file">
         <property name="package.name" value="${APPNAME}-${application.branch}"/>
         <property name="package.jarname" value="${DistJarName}"/>
@@ -169,19 +175,74 @@
             </tarfileset>
         </tar>
     </target>
+
+<macrodef name="unsignjar">
+        
+    <attribute name="jar"/>
+            
+    <sequential>
+        <!-- Remove any existing signatures from a JAR file. -->
+        <tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file"/>
+        <echo message="Removing signatures from JAR: @{jar}"/>
+        <mkdir dir="${temp.file}"/>
+                
+        <unjar src="@{jar}" dest="${temp.file}">
+            <patternset>
+                <include name="**"/>
+                <exclude name="META-INF/*.SF"/>
+                <exclude name="META-INF/*.DSA"/>
+                <exclude name="META-INF/*.RSA"/>
+            </patternset>
+        </unjar>
+                
+        <delete file="@{jar}" failonerror="true"/>
+                
+        <!-- Touch it in case the file didn't have a manifest.
+             Otherwise the JAR task below will fail if the manifest 
+             file doesn't exist. -->
+        <mkdir dir="${temp.file}/META-INF"/>
+        <touch file="${temp.file}/META-INF/MANIFEST.MF"/>
+                
+        <jar destfile="@{jar}" 
+            basedir="${temp.file}" 
+            includes="**" 
+            manifest="${temp.file}/META-INF/MANIFEST.MF"/>
+                
+        <delete dir="${temp.file}" failonerror="true"/>
+    </sequential>
+</macrodef>
+
     <target name="signapplication" depends="maven-jar">
+
         <input message="Please enter the latsoftware password:" addproperty="latsoftware.pw">
             <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
         </input>
+
+<for param="file">
+    <path>
+        <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar"/>
+    </path>
+    <sequential>
+    	<unsignjar jar="@{file}" />
+        <signjar
+            jar="@{file}"
+            alias="${KeyName}"
+            storepass="${latsoftware.pw}"
+            keystore="${KeyStoreLocation}"/>
+    </sequential>
+</for>
+<!--
         <signjar keystore="${KeyStoreLocation}"
                  alias="${KeyName}" storepass="${latsoftware.pw}">
             <path>
                 <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar" />
             </path>
         </signjar>
+-->
         <signjar jar="${OUTPUTDIR}/${DistJarName}"
                  keystore="${KeyStoreLocation}"
                  alias="${KeyName}" storepass="${latsoftware.pw}" />
+
     </target>
     <target name="GetTracTodoList" depends="loadproperties,GetLoginData" if="application.todoListLocation">
         <!--        todo: add another file for the rss feed of completed tasks-->        
@@ -302,5 +363,6 @@
             <arg line="-Doutput.exeFile=${WindowsLauncherExe}" />
         </exec>
     </target>
+
 </project>
  
