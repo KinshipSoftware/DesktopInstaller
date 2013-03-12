@@ -12,6 +12,11 @@ To use this installer in your project, execute the following steps:
   overwritten!
 - Perform an svn update in that directory. The 'installer' directory will be
   added to the project.
+- Install ant-contrib if its not already installed. Make sure the file 
+  /usr/share/java/ant-contrib.jar exists. On debian this can be done by 
+  typing:
+	`sudo apt-get install ant-contrib`
+  which should install the package in the right place.
 - Go to the 'installer/ant-deb-jar' directory and download the following
   file: <http://ant-deb-task.googlecode.com/files/ant-deb-0.0.1.jar>.
 - Copy the file 'installer/application.properties.example' to your project
