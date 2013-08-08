@@ -362,7 +362,7 @@
         </exec>
     </target>
 
-   <target name="copy_sources_to_lux09" depends="maven-build-sources-packages,GetLoginData">
+   <target name="copy_sources_to_lux09"   depends="maven-build-sources-packages,loadproperties,GetLoginData">
         <antcall target="-copy_sources_to_lux09" />
     </target>
 
