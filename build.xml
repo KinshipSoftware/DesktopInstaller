@@ -319,7 +319,7 @@
             <arg line="clean compile" />
             <arg line="-Doutput.directory=${OUTPUTDIR}"/>
         </exec>
-    </target>    
+    </target>
     <target name="maven-jar" depends="updateJnlpAndAppletHtml">
         <!-- clean must be run before updateJnlpAndAppletHtml otherwise the jnlp file gets deleted from the classes before making the jar file -->
         <!-- while this could be done in a maven ant task, this method appears more portable at this stage -->
@@ -359,6 +359,25 @@
             <arg line="-Dinput.jarFile=${DistJarName}" />
             <arg line="-Dinput.iconsDir=${IconsDir}" />
             <arg line="-Doutput.exeFile=${WindowsLauncherExe}" />
+        </exec>
+    </target>
+
+   <target name="copy_sources_to_lux09" depends="setproperties,loadproperties,GetLoginData,-maven-build-sources-package">
+        <antcall target="-copy_sources_to_lux09" />
+    </target>
+
+    <!-- 'private' target without dependencies so that scp_to_lux09 can call this without re-compiling the application -->
+    <target name="-copy_sources_to_lux09" if="application.releaseNotesLocation">
+    	<fail unless="application.sources.archiveLocation" />
+        <!-- copy the release notes -->
+        <echo message="Copying source package notes from ${application.sources.baseDir}${application.sources.archiveLocation} to ${APPNAME}-${application.branch}-src-tar.gz on server" />
+	<scp file="${application.sources.baseDir}${application.sources.archiveLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}-src-tar.gz" />
+    </target>
+
+    <target name="-maven-build-sources-package" if="application.sources.baseDir">
+        <exec dir="${application.sources.baseDir}" executable="mvn" failonerror="true">
+            <arg line="clean install" />
+            <arg line="-DskipTests=true"/>
         </exec>
     </target>
 
