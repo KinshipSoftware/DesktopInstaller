@@ -18,7 +18,6 @@
         <property name="ClassDir" location="${application.baseDir}/target/classes" />
         <property name="KeyStoreLocation" location="${application.baseDir}${mpi.keystorelocation}" />
         <property name="KeyName" value="${mpi.keyname}" />
-        <property name="TypeCheckVersion" value="1.6.5" />
         <property name="ExternalPropertiesFile" value="${ClassDir}${application.packagePath}/version.properties" />
     </target>
     <target name="loadproperties" depends="maven-compile">
@@ -100,7 +99,6 @@
                             <token key="DistJarName" value="${DistJarName}"/>
                             <token key="BuildDirectory" value="${APPNAME}-build-${application.majorVersion}.${application.minorVersion}.x"/>
                             <token key="InstalledIcon" value="${application.icon-file-name}"/>
-                            <token key="TypeCheckVersion" value="${TypeCheckVersion}"/>
                             <token key="Branch" value="${application.branch}"/>
                             <token key="ApplicationTitle" value="${application.title}"/>
                             <token key="LongDescription" value="${application.longDescription}"/>
