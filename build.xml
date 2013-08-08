@@ -270,7 +270,7 @@
     <target name="createVersionFile" depends="loadproperties">
         <echo file="${OUTPUTDIR}/${APPNAME}-${application.branch}-current.txt">${application.revision}</echo>
     </target>
-    <target name="scp_to_lux09" depends="clean, makeDebPackage, buildWindowsInstaller, buildMacInstaller, createVersionFile, GetLoginData, GetTracTodoList">
+    <target name="scp_to_lux09" depends="clean, maven-build-sources-packages, makeDebPackage, buildWindowsInstaller, buildMacInstaller, createVersionFile, GetLoginData, GetTracTodoList">
         <scp file="${OUTPUTDIR}/${DistJarName}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/"/>
         <!-- the lib direcory only needs to be updated when there is a real change so can be commented out to save build time -->
         <scp todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/lib">
@@ -299,6 +299,7 @@
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/todolisttable.php" todir="${application.baseDir}/src/main/php/" />
         <!-- copy release notes (only if property is set, see target condition) -->
     	<antcall target="-copy_release_notes_to_lux09" />
+    	<antcall target="-copy_sources_to_lux09" />
         <!-- set the required permissions for apache --> 
         <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="find /data/extweb1/docs/TG/j2se/jnlp/${APPNAME} -user ${lux09.user} -follow -exec chmod a+r,g+w {} \;" />
     </target>
