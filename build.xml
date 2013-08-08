@@ -362,19 +362,24 @@
         </exec>
     </target>
 
-   <target name="copy_sources_to_lux09" depends="setproperties,loadproperties,GetLoginData,-maven-build-sources-package">
+   <target name="copy_sources_to_lux09" depends="maven-build-sources-packages,loadproperties,GetLoginData">
         <antcall target="-copy_sources_to_lux09" />
     </target>
 
     <!-- 'private' target without dependencies so that scp_to_lux09 can call this without re-compiling the application -->
-    <target name="-copy_sources_to_lux09" if="application.releaseNotesLocation">
+    <target name="-copy_sources_to_lux09" if="application.sources.archiveLocation">
     	<fail unless="application.sources.archiveLocation" />
         <!-- copy the release notes -->
         <echo message="Copying source package notes from ${application.sources.baseDir}${application.sources.archiveLocation} to ${APPNAME}-${application.branch}-src-tar.gz on server" />
 	<scp file="${application.sources.baseDir}${application.sources.archiveLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}-src-tar.gz" />
     </target>
 
+   <target name="maven-build-sources-packages" depends="setproperties">
+   	<antcall target="-maven-build-sources-package" />
+   </target>
+
     <target name="-maven-build-sources-package" if="application.sources.baseDir">
+    	<fail unless="application.sources.baseDir" />
         <exec dir="${application.sources.baseDir}" executable="mvn" failonerror="true">
             <arg line="clean install" />
             <arg line="-DskipTests=true"/>

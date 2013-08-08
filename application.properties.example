@@ -42,6 +42,11 @@ application.winUtilsLocation=http://www.mpi.nl/tg/j2se/jnlp/arbil/lib/arbil-winu
 # application basedir relative to the installer
 application.baseDir=../
 
+# sources project basedir(i.e. parent project) relative to the installer
+application.sources.baseDir=../../
+# location of sources archive created when building sources project relative to sources project basedir
+application.sources.archiveLocation=target/arbil-src.tar.gz
+
 # NOTICE: The following locations are relative to the application's base directory!
 
 # location of icons directory, relative to the application baseDir
