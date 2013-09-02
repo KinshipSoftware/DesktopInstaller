@@ -375,6 +375,12 @@
 	<scp file="${application.sources.baseDir}${application.sources.archiveLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}-src.zip" />
     </target>
 
+   <!-- 
+   This will do a 'clean install' on the parent project with the goal of
+   a source archive becoming present in the configured
+   location (application.sources.archiveLocation) relative to the parent
+   project 
+   -->
    <target name="maven-build-sources-packages" depends="setproperties">
    	<antcall target="-maven-build-sources-package" />
    </target>
