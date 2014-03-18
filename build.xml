@@ -39,9 +39,9 @@
     <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant-deb.classpath"/>
     <taskdef name="desktopEntry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant-deb.classpath"/>
     <taskdef resource="net/sf/antcontrib/antlib.xml">
-    	<classpath>
-    	    <pathelement location="/usr/share/java/ant-contrib.jar"/>
-    	</classpath>
+        <classpath>
+            <pathelement location="/usr/share/java/ant-contrib.jar"/>
+        </classpath>
     </taskdef>
     <target name="makeDebPackage" depends="signapplication" description="build the deb file">
         <property name="package.name" value="${APPNAME}-${application.branch}"/>
@@ -174,69 +174,69 @@
         </tar>
     </target>
 
-<macrodef name="unsignjar">
+    <macrodef name="unsignjar">
         
-    <attribute name="jar"/>
+        <attribute name="jar"/>
             
-    <sequential>
-        <!-- Remove any existing signatures from a JAR file. -->
-        <tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file"/>
-        <echo message="Removing signatures from JAR: @{jar}"/>
-        <mkdir dir="${temp.file}"/>
+        <sequential>
+            <!-- Remove any existing signatures from a JAR file. -->
+            <tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file"/>
+            <echo message="Removing signatures from JAR: @{jar}"/>
+            <mkdir dir="${temp.file}"/>
                 
-        <unjar src="@{jar}" dest="${temp.file}">
-            <patternset>
-                <include name="**"/>
-                <exclude name="META-INF/*.SF"/>
-                <exclude name="META-INF/*.DSA"/>
-                <exclude name="META-INF/*.RSA"/>
-            </patternset>
-        </unjar>
+            <unjar src="@{jar}" dest="${temp.file}">
+                <patternset>
+                    <include name="**"/>
+                    <exclude name="META-INF/*.SF"/>
+                    <exclude name="META-INF/*.DSA"/>
+                    <exclude name="META-INF/*.RSA"/>
+                </patternset>
+            </unjar>
                 
-        <delete file="@{jar}" failonerror="true"/>
+            <delete file="@{jar}" failonerror="true"/>
                 
-        <!-- Touch it in case the file didn't have a manifest.
-             Otherwise the JAR task below will fail if the manifest 
-             file doesn't exist. -->
-        <mkdir dir="${temp.file}/META-INF"/>
-        <touch file="${temp.file}/META-INF/MANIFEST.MF"/>
+            <!-- Touch it in case the file didn't have a manifest.
+            Otherwise the JAR task below will fail if the manifest 
+            file doesn't exist. -->
+            <mkdir dir="${temp.file}/META-INF"/>
+            <touch file="${temp.file}/META-INF/MANIFEST.MF"/>
                 
-        <jar destfile="@{jar}" 
-            basedir="${temp.file}" 
-            includes="**" 
-            manifest="${temp.file}/META-INF/MANIFEST.MF"/>
+            <jar destfile="@{jar}" 
+             basedir="${temp.file}" 
+             includes="**" 
+             manifest="${temp.file}/META-INF/MANIFEST.MF"/>
                 
-        <delete dir="${temp.file}" failonerror="true"/>
-    </sequential>
-</macrodef>
+            <delete dir="${temp.file}" failonerror="true"/>
+        </sequential>
+    </macrodef>
 
     <target name="signapplication" depends="maven-jar">
-
+        <echo message="The following sections requires the use of ant-contrib. This can be installed with: sudo apt-get install ant-contrib"/>
         <input message="Please enter the latsoftware password:" addproperty="latsoftware.pw">
             <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
         </input>
 
-<for param="file">
-    <path>
-        <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar"/>
-    </path>
-    <sequential>
-    	<unsignjar jar="@{file}" />
-        <signjar
-            jar="@{file}"
-            alias="${KeyName}"
-            storepass="${latsoftware.pw}"
-            keystore="${KeyStoreLocation}"/>
-    </sequential>
-</for>
-<!--
-        <signjar keystore="${KeyStoreLocation}"
-                 alias="${KeyName}" storepass="${latsoftware.pw}">
+        <for param="file">
             <path>
-                <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar" />
+                <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar"/>
             </path>
-        </signjar>
--->
+            <sequential>
+                <unsignjar jar="@{file}" />
+                <signjar
+                    jar="@{file}"
+                    alias="${KeyName}"
+                    storepass="${latsoftware.pw}"
+                    keystore="${KeyStoreLocation}"/>
+            </sequential>
+        </for>
+        <!--
+                <signjar keystore="${KeyStoreLocation}"
+                         alias="${KeyName}" storepass="${latsoftware.pw}">
+                    <path>
+                        <fileset dir="${OUTPUTDIR}/lib" includes="**/*.jar" />
+                    </path>
+                </signjar>
+        -->
         <signjar jar="${OUTPUTDIR}/${DistJarName}"
                  keystore="${KeyStoreLocation}"
                  alias="${KeyName}" storepass="${latsoftware.pw}" />
@@ -298,21 +298,21 @@
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/allversionslisting.php" todir="${application.baseDir}/src/main/php/" />
         <scp file="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/todolisttable.php" todir="${application.baseDir}/src/main/php/" />
         <!-- copy release notes (only if property is set, see target condition) -->
-    	<antcall target="-copy_release_notes_to_lux09" />
-    	<antcall target="-copy_sources_to_lux09" />
+        <antcall target="-copy_release_notes_to_lux09" />
+        <antcall target="-copy_sources_to_lux09" />
         <!-- set the required permissions for apache --> 
         <sshexec host="lux09.mpi.nl" username="${lux09.user}" password="${lux09.pw}" command="find /data/extweb1/docs/TG/j2se/jnlp/${APPNAME} -user ${lux09.user} -follow -exec chmod a+r,g+w {} \;" />
     </target>
     <target name="copy_release_notes_to_lux09" depends="setproperties,loadproperties,GetLoginData">
-    	<antcall target="-copy_release_notes_to_lux09" />
+        <antcall target="-copy_release_notes_to_lux09" />
     </target>
     <!-- 'private' target without dependencies so that scp_to_lux09 can call this without re-compiling the application -->
     <target name="-copy_release_notes_to_lux09" if="application.releaseNotesLocation">
-    	<fail unless="application.releaseNotesLocation" />
+        <fail unless="application.releaseNotesLocation" />
         <!-- copy the release notes -->
         <echo message="Copying release notes from ${application.baseDir}${application.releaseNotesLocation} to release_notes-${APPNAME}-${application.branch}.txt on server" />
-	<scp file="${application.baseDir}${application.releaseNotesLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/release_notes-${APPNAME}-${application.branch}.txt" />
-	<scp file="${application.baseDir}${application.releaseNotesLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/release_notes-${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}.txt" />
+        <scp file="${application.baseDir}${application.releaseNotesLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/release_notes-${APPNAME}-${application.branch}.txt" />
+        <scp file="${application.baseDir}${application.releaseNotesLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/release_notes-${APPNAME}-${application.branch}_${application.majorVersion}.${application.minorVersion}.txt" />
     </target>
     <target name="maven-compile" depends="setproperties">
         <!-- while this could be done in a maven ant task, this method appears more portable at this stage -->
@@ -352,7 +352,7 @@
         </exec>
     </target>
     <target name="createWindowsLauncher" depends="prepareWinUtilsDir, maven-jar">
-    	 <exec dir="." executable="mvn" failonerror="true">
+        <exec dir="." executable="mvn" failonerror="true">
             <arg line="-f launch4j-pom.xml" />
             <arg line="package" />
             <arg line="-Dapplication.propertiesFile=${ExternalPropertiesFile}"/>
@@ -363,30 +363,30 @@
         </exec>
     </target>
 
-   <target name="copy_sources_to_lux09"   depends="maven-build-sources-packages,loadproperties,GetLoginData">
+    <target name="copy_sources_to_lux09"   depends="maven-build-sources-packages,loadproperties,GetLoginData">
         <antcall target="-copy_sources_to_lux09" />
     </target>
 
     <!-- 'private' target without dependencies so that scp_to_lux09 can call this without re-compiling the application -->
     <target name="-copy_sources_to_lux09" if="application.sources.archiveLocation">
-    	<fail unless="application.sources.archiveLocation" />
+        <fail unless="application.sources.archiveLocation" />
         <!-- copy the release notes -->
         <echo message="Copying source package notes from ${application.sources.baseDir}${application.sources.archiveLocation} to ${APPNAME}-${application.branch}-src.zip on server" />
-	<scp file="${application.sources.baseDir}${application.sources.archiveLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}-src.zip" />
+        <scp file="${application.sources.baseDir}${application.sources.archiveLocation}" todir="${lux09.user}:${lux09.pw}@lux09.mpi.nl:/data/extweb1/docs/TG/j2se/jnlp/${APPNAME}/${APPNAME}-${application.branch}-src.zip" />
     </target>
 
-   <!-- 
-   This will do a 'clean install' on the parent project with the goal of
-   a source archive becoming present in the configured
-   location (application.sources.archiveLocation) relative to the parent
-   project 
-   -->
-   <target name="maven-build-sources-packages" depends="setproperties">
-   	<antcall target="-maven-build-sources-package" />
-   </target>
+    <!-- 
+    This will do a 'clean install' on the parent project with the goal of
+    a source archive becoming present in the configured
+    location (application.sources.archiveLocation) relative to the parent
+    project 
+    -->
+    <target name="maven-build-sources-packages" depends="setproperties">
+        <antcall target="-maven-build-sources-package" />
+    </target>
 
     <target name="-maven-build-sources-package" if="application.sources.baseDir">
-    	<fail unless="application.sources.baseDir" />
+        <fail unless="application.sources.baseDir" />
         <exec dir="${application.sources.baseDir}" executable="mvn" failonerror="true">
             <arg line="clean install" />
             <arg line="-DskipTests=true"/>
