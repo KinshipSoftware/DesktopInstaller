@@ -202,9 +202,9 @@
             <touch file="${temp.file}/META-INF/MANIFEST.MF"/>
                 
             <jar destfile="@{jar}" 
-             basedir="${temp.file}" 
-             includes="**" 
-             manifest="${temp.file}/META-INF/MANIFEST.MF"/>
+                 basedir="${temp.file}" 
+                 includes="**" 
+                 manifest="${temp.file}/META-INF/MANIFEST.MF"/>
                 
             <delete dir="${temp.file}" failonerror="true"/>
         </sequential>
@@ -262,6 +262,7 @@
 
     </target>
     <target name="GetLoginData">
+        <echo message="If you get an error regarding jsch, it is probably because ant-jsch.jar cannot find jsch.jar. On a debian system you should first try linking the required jar file: 'sudo ln -s /usr/share/java/jsch.jar /usr/share/ant/lib/'"/>
         <input message="Please enter lux09 username:" addproperty="lux09.user" />
         <input message="Please enter lux09 password:" addproperty="lux09.pw">
             <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
